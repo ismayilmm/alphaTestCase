@@ -1,0 +1,12 @@
+---
+- name: Deploy PostgreSQL and create table
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Install PostgreSQL using Helm chart
+      command: helm install postgres bitnami/postgresql
+    - name: Wait for PostgreSQL deployment to be ready
+      command: kubectl wait --for=condition=available --timeout=300s deployment/postgres
+    - name: Create table in PostgreSQL
+      command: kubectl exec -i postgres-postgresql-0 -- createdb mydatabase && kubectl exec -i postgres-postgresql-0 -- psql -U postgres -d mydatabase -c "CREATE TABLE mytable (id serial primary key, ip_address varchar(15))"
+
